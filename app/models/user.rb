@@ -51,7 +51,7 @@ class User < ApplicationRecord
       #   user = User.arel_table
       #   intersection = Arel::Nodes::Intersect.new(nearbys.ast, skill.ast)
       #   User.from(user.create_table_alias(intersection, :users))
-      self.nearbys(rad).joins(:tags).where(ActsAsTaggableOn::Tag.arel_table[:name].in tags.pluck(:name)).uniq
+      self.nearbys(rad).joins(:tags).where(tags: {name: tags.pluck(:name)}).uniq
     else
       #Gives me an ActiveRecord::Relation with all related skills
       self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
