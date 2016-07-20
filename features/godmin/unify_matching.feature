@@ -9,12 +9,12 @@ Feature: As a user
 
   Background:
     Given the following users exist
-      | user_name | skills                        | mentor |
-      | Thomas    | programming, cooking, Travels | true   |
-      | Sam       | programming                   | true   |
-      | Mazen     | sailing                       | false  |
-      | Tarek     | Programming, politics         | false  |
-      | Ivan      | programming                   | false  |
+      | user_name | skills                        | mentor | 
+      | Thomas    | programming, cooking, Travels | true   | 
+      | Sam       | programming                   | true   | 
+      | Mazen     | sailing                       | false  | 
+      | Tarek     | Programming, politics         | false  | 
+      | Ivan      | programming                   | false  | 
     Given the admin account is set up
     Given I am logged in as admin
     Given I click on "Users"

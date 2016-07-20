@@ -142,6 +142,44 @@ RSpec.describe User, type: :model do
     end
 
   end
+  
+  describe 'unify_location' do
+    let(:user_1) { FactoryGirl.create(:user, user_name: 'Thomas', mentor: true) }
+    let(:user_2) { FactoryGirl.create(:user, user_name: 'Anders') }
+    let(:user_3) { FactoryGirl.create(:user, user_name: 'Kalle') }
+    let(:user_4) { FactoryGirl.create(:user, user_name: 'Kai') }
+    let(:user_5) { FactoryGirl.create(:user, user_name: 'Bernd') }
+    before do
+      user_1.update(skill_list: 'java-script, testing, ruby')
+      user_1.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
+      user_2.update(skill_list: 'java-script, java, html')
+      user_2.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
+      user_3.update(skill_list: 'ionic, html')
+      user_3.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
+      user_4.update(skill_list: 'java, java-script,html')
+      user_4.update(latitude: '53.551085', longitude: '9.993682') #Hamburg, Germany
+      user_5.update(skill_list: 'ionic,angular')
+      user_5.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
+    end
+    it 'unifies mentors to mentorees by skill and area' do
+      expect(user_1.unify(20,true)).to include(user_2)
+    end
+    it 'does not unify mentors to mentorees if too wide apart' do
+      expect(user_1.unify(20,true)).not_to include(user_4)
+    end
+    it 'does not unify mentors to mentorees if skills dont match' do
+      expect(user_1.unify(20,true)).not_to include(user_3)
+    end
+    it 'unifies mentorees to mentors and mentorees by skill and area' do
+      expect(user_2.unify(20,true)).to include(user_3, user_1)
+    end
+    it 'does not unify mentorees to mentors and mentorees by skill if too wide apart' do
+      expect(user_2.unify(20,true)).not_to include(user_4)
+    end
+    it 'does not unify mentorees to mentors and mentorees by skill if skills dont match' do
+      expect(user_2.unify(20,true)).not_to include(user_5)
+    end
+  end
 
   describe 'friendly_id' do
     let(:user_1) { FactoryGirl.create(:user, user_name: 'Thomas') }
@@ -207,7 +245,7 @@ RSpec.describe User, type: :model do
       user_1.invite user_3
       user_2.approve user_1
       user_3.approve user_1
-      expect(user_1.friends).to eq [user_2, user_3]
+      expect(user_1.friends).to include(user_2, user_3)
     end
   end
 end

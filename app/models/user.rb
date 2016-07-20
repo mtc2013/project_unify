@@ -33,8 +33,15 @@ class User < ApplicationRecord
     user_name
   end
 
-  def unify
-    self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
+  def unify(rad=0,location=false)
+    if location
+      #debugger
+      #Gives me an ActiveRecord::Relation with all Objects within the specific area
+      self.nearbys(rad)
+    else
+      #Gives me an ActiveRecord::Relation with all related skills
+      self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
+    end
   end
 
   def self.from_omniauth(auth)
