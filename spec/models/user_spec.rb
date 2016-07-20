@@ -184,6 +184,10 @@ RSpec.describe User, type: :model do
     it 'does not unify mentorees to mentors and mentorees by skill if skills dont match' do
       expect(user_2.unify(location: true)).not_to include(user_5)
     end
+    it 'does not unify mentors to mentors even if skills match' do
+      user_2.update_attributes!(mentor: 'true')
+      expect(user_1.unify(location: true)).not_to include(user_2)
+    end
   end
 
   describe 'friendly_id' do

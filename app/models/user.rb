@@ -36,26 +36,8 @@ class User < ApplicationRecord
   end
 
   def unify(rad = 20, location: false )
-    if location
-      #Gives me an ActiveRecord::Relation with all Objects within the specific area
-      #todo: refactor this into something better
-      # nearbys = self.nearbys(rad)
-      # skill = self.class.all
-      # debugger
-      # intersection = []
-      # skill.each do |usr|
-      #   if nearbys.include? usr
-      #     intersection.push usr
-      #   end
-      # end
-      #   user = User.arel_table
-      #   intersection = Arel::Nodes::Intersect.new(nearbys.ast, skill.ast)
-      #   User.from(user.create_table_alias(intersection, :users))
-      self.nearbys(rad).joins(:tags).where(tags: {name: tags.pluck(:name)}).uniq
-    else
-      #Gives me an ActiveRecord::Relation with all related skills
-      self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
-    end
+    results = location == true ? self.nearbys(rad).joins(:tags).where(tags: {name: tags.pluck(:name)}).uniq : self.find_related_skills
+    self.mentor ? results.mentorees : results
   end
 
   def self.from_omniauth(auth)
