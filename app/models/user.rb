@@ -6,6 +6,8 @@ class User < ApplicationRecord
 
   acts_as_taggable_on :skills
   acts_as_messageable
+  has_many :skills, foreign_key: :taggable_id
+  has_many :tags, through: :skills
 
   has_many :user_languages
   has_many :languages, through: :user_languages
@@ -28,6 +30,7 @@ class User < ApplicationRecord
   scope :all_profiles, -> { unscoped }
   scope :mentors, -> { where(mentor: true) }
   scope :mentorees, -> { where(mentor: false) }
+  scope :related_skills, ->(skills){select('*').from('users','tags').from('taggings')}
 
 
   def to_s
@@ -38,16 +41,19 @@ class User < ApplicationRecord
     if location
       #Gives me an ActiveRecord::Relation with all Objects within the specific area
       #todo: refactor this into something better
-      nearbys = self.nearbys(rad)
-      skill = self.find_related_skills
-      intersection = []
-      skill.each do |usr|
-        if nearbys.include? usr
-          intersection.push usr
-        end
-      end
-      intersection
-      #User.from(User.arel_table.create_table_alias(total, :users))
+      # nearbys = self.nearbys(rad)
+      # skill = self.class.all
+      # debugger
+      # intersection = []
+      # skill.each do |usr|
+      #   if nearbys.include? usr
+      #     intersection.push usr
+      #   end
+      # end
+      #   user = User.arel_table
+      #   intersection = Arel::Nodes::Intersect.new(nearbys.ast, skill.ast)
+      #   User.from(user.create_table_alias(intersection, :users))
+      self.nearbys(rad).joins(:tags).where(ActsAsTaggableOn::Tag.arel_table[:name].in tags.pluck(:name)).uniq
     else
       #Gives me an ActiveRecord::Relation with all related skills
       self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
