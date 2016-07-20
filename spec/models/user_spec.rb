@@ -166,6 +166,7 @@ RSpec.describe User, type: :model do
 
     it 'unifies mentors to mentees by skill and area' do
       expect(user_1.unify(location: true)).to include(user_2)
+      expect(user_1.unify(location:true)).to_not include(user_3)
     end
 
     it 'does not unify mentors to mentees if too wide apart' do

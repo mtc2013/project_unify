@@ -36,9 +36,18 @@ class User < ApplicationRecord
 
   def unify(rad = 20, location: false )
     if location
-      binding.pry
       #Gives me an ActiveRecord::Relation with all Objects within the specific area
-      self.nearbys(rad)
+      #todo: refactor this into something better
+      nearbys = self.nearbys(rad)
+      skill = self.find_related_skills
+      intersection = []
+      skill.each do |usr|
+        if nearbys.include? usr
+          intersection.push usr
+        end
+      end
+      intersection
+      #User.from(User.arel_table.create_table_alias(total, :users))
     else
       #Gives me an ActiveRecord::Relation with all related skills
       self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
