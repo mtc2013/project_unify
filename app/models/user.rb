@@ -30,8 +30,6 @@ class User < ApplicationRecord
   scope :all_profiles, -> { unscoped }
   scope :mentors, -> { where(mentor: true) }
   scope :mentorees, -> { where(mentor: false) }
-  scope :related_skills, ->(skills){select('*').from('users','tags').from('taggings')}
-
 
   def to_s
     user_name
