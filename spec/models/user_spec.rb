@@ -170,20 +170,19 @@ RSpec.describe User, type: :model do
     end
 
     it 'does not unify mentors to mentees if too wide apart' do
-      expect(user_1.unify(true)).not_to include(user_4)
+      expect(user_1.unify(location: true)).not_to include(user_4)
     end
-
     it 'does not unify mentors to mentees if skills dont match' do
-      expect(user_1.unify(true)).not_to include(user_3)
+      expect(user_1.unify(location: true)).not_to include(user_3)
     end
     it 'unifies mentorees to mentors and mentees by skill and area' do
-      expect(user_2.unify(true)).to include(user_3, user_1)
+      expect(user_2.unify(location: true)).to include(user_3, user_1)
     end
     it 'does not unify mentorees to mentors and mentorees by skill if too wide apart' do
-      expect(user_2.unify(true)).not_to include(user_4)
+      expect(user_2.unify(location: true)).not_to include(user_4)
     end
     it 'does not unify mentorees to mentors and mentorees by skill if skills dont match' do
-      expect(user_2.unify(true)).not_to include(user_5)
+      expect(user_2.unify(location: true)).not_to include(user_5)
     end
   end
 
