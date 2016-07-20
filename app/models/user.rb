@@ -10,13 +10,13 @@ class User < ApplicationRecord
   has_many :user_languages
   has_many :languages, through: :user_languages
 
-  after_validation :reverse_geocode, if: lambda{ |obj| obj.latitude.present? || obj.longitude.present? }
-  after_validation :geocode, if: lambda{ |obj| obj.ip_address.present? }
-  
+  after_validation :reverse_geocode, if: lambda { |obj| obj.latitude.present? || obj.longitude.present? }
+  after_validation :geocode, if: lambda { |obj| obj.ip_address.present? }
+
   validates :gender,
-    inclusion: { in: [ 'Male', 'Female', 'male', 'female', nil ],
-    message: "%{value} is not a valid gender" }
-    
+            inclusion: {in: ['Male', 'Female', 'male', 'female', nil],
+                        message: "%{value} is not a valid gender"}
+
   validates_length_of :introduction, maximum: 140, message: "Maximum length is 140 characters"
 
   devise :database_authenticatable, :registerable,
@@ -29,15 +29,25 @@ class User < ApplicationRecord
   scope :mentors, -> { where(mentor: true) }
   scope :mentorees, -> { where(mentor: false) }
 
+
   def to_s
     user_name
   end
 
-  def unify(location=false,rad=20)
+  def unify(rad = 20, location: false )
     if location
-      #debugger
       #Gives me an ActiveRecord::Relation with all Objects within the specific area
-      self.nearbys(rad)
+      #todo: refactor this into something better
+      nearbys = self.nearbys(rad)
+      skill = self.find_related_skills
+      intersection = []
+      skill.each do |usr|
+        if nearbys.include? usr
+          intersection.push usr
+        end
+      end
+      intersection
+      #User.from(User.arel_table.create_table_alias(total, :users))
     else
       #Gives me an ActiveRecord::Relation with all related skills
       self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
@@ -47,7 +57,7 @@ class User < ApplicationRecord
   def self.from_omniauth(auth)
     where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
       user.email = auth.info.email
-      user.password = Devise.friendly_token[0,10]
+      user.password = Devise.friendly_token[0, 10]
       user.user_name = auth.info.name
     end
   end
@@ -64,20 +74,20 @@ class User < ApplicationRecord
   def reset_authentication_token
     self.update_attribute(:authentication_token, nil)
   end
-  
-  reverse_geocoded_by :latitude, :longitude, address: :location do |obj,results|
+
+  reverse_geocoded_by :latitude, :longitude, address: :location do |obj, results|
     if geo = results.first
-      obj.city     = geo.city
-      obj.state    = geo.state
-      obj.country  = geo.country
+      obj.city = geo.city
+      obj.state = geo.state
+      obj.country = geo.country
     end
   end
-  
-  geocoded_by :ip_address do |obj,results|
+
+  geocoded_by :ip_address do |obj, results|
     if geo = results.first
-      obj.city     = geo.city
-      obj.state    = geo.state
-      obj.country  = geo.country
+      obj.city = geo.city
+      obj.state = geo.state
+      obj.country = geo.country
     end
   end
 
@@ -98,11 +108,11 @@ class User < ApplicationRecord
     #Rails 5 error with .count(:id, distinct: true)
     self.mailbox.conversations(unread: true).distinct.count(:id)
   end
-  
+
   private
-  
+
   def address
     [city, state, country].compact.join(', ')
   end
-  
+
 end

@@ -46,6 +46,7 @@ RSpec.describe User, type: :model do
       it { is_expected.to allow_value(email).for(:email) }
     end
   end
+
   describe 'Fixtures' do
     
     it 'should have valid Fixture Factory' do
@@ -149,6 +150,7 @@ RSpec.describe User, type: :model do
     let(:user_3) { FactoryGirl.create(:user, user_name: 'Kalle') }
     let(:user_4) { FactoryGirl.create(:user, user_name: 'Kai') }
     let(:user_5) { FactoryGirl.create(:user, user_name: 'Bernd') }
+
     before do
       user_1.update(skill_list: 'java-script, testing, ruby')
       user_1.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
@@ -156,21 +158,25 @@ RSpec.describe User, type: :model do
       user_2.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
       user_3.update(skill_list: 'ionic, html')
       user_3.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
-      user_4.update(skill_list: 'java, java-script,html')
+      user_4.update(skill_list: 'java, java-script, html')
       user_4.update(latitude: '53.551085', longitude: '9.993682') #Hamburg, Germany
       user_5.update(skill_list: 'ionic,angular')
       user_5.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
     end
-    it 'unifies mentors to mentorees by skill and area' do
-      expect(user_1.unify(true)).to include(user_2)
+
+    it 'unifies mentors to mentees by skill and area' do
+      expect(user_1.unify(location: true)).to include(user_2)
+      expect(user_1.unify(location:true)).to_not include(user_3)
     end
-    it 'does not unify mentors to mentorees if too wide apart' do
+
+    it 'does not unify mentors to mentees if too wide apart' do
       expect(user_1.unify(true)).not_to include(user_4)
     end
-    it 'does not unify mentors to mentorees if skills dont match' do
+
+    it 'does not unify mentors to mentees if skills dont match' do
       expect(user_1.unify(true)).not_to include(user_3)
     end
-    it 'unifies mentorees to mentors and mentorees by skill and area' do
+    it 'unifies mentorees to mentors and mentees by skill and area' do
       expect(user_2.unify(true)).to include(user_3, user_1)
     end
     it 'does not unify mentorees to mentors and mentorees by skill if too wide apart' do
