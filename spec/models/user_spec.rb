@@ -162,22 +162,22 @@ RSpec.describe User, type: :model do
       user_5.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
     end
     it 'unifies mentors to mentorees by skill and area' do
-      expect(user_1.unify(20,true)).to include(user_2)
+      expect(user_1.unify(true)).to include(user_2)
     end
     it 'does not unify mentors to mentorees if too wide apart' do
-      expect(user_1.unify(20,true)).not_to include(user_4)
+      expect(user_1.unify(true)).not_to include(user_4)
     end
     it 'does not unify mentors to mentorees if skills dont match' do
-      expect(user_1.unify(20,true)).not_to include(user_3)
+      expect(user_1.unify(true)).not_to include(user_3)
     end
     it 'unifies mentorees to mentors and mentorees by skill and area' do
-      expect(user_2.unify(20,true)).to include(user_3, user_1)
+      expect(user_2.unify(true)).to include(user_3, user_1)
     end
     it 'does not unify mentorees to mentors and mentorees by skill if too wide apart' do
-      expect(user_2.unify(20,true)).not_to include(user_4)
+      expect(user_2.unify(true)).not_to include(user_4)
     end
     it 'does not unify mentorees to mentors and mentorees by skill if skills dont match' do
-      expect(user_2.unify(20,true)).not_to include(user_5)
+      expect(user_2.unify(true)).not_to include(user_5)
     end
   end
 

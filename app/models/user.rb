@@ -33,7 +33,7 @@ class User < ApplicationRecord
     user_name
   end
 
-  def unify(rad=0,location=false)
+  def unify(location=false,rad=20)
     if location
       #debugger
       #Gives me an ActiveRecord::Relation with all Objects within the specific area
