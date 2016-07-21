@@ -134,7 +134,6 @@ describe Api::V1::UsersController do
                                      skills: user_2.skill_list.reverse,
                                      profile: api_v1_user_url(user_2)}
                              }]
-        binding.pry
         expect(response_json['matches']).to eq JSON.parse(expected_response.to_json)
       end
 
