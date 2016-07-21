@@ -91,26 +91,16 @@ describe Api::V1::UsersController do
     describe 'by skills' do
       it 'should return list of users' do
         get "/api/v1/unify/#{user_1.id}", params: nil, headers: headers
-        # This is not so readable as to what we actually expect the response to be
-        # expected_response = []
-        # user_1.unify.each do |user|
-        #   hash = {id: user.id,
-        #           user_name: user.user_name,
-        #           created_at: user.created_at,
-        #           skills: user.skill_list,
-        #           profile: api_v1_user_url(user)}
-        #   expected_response << {user: hash}
-        # end
         expected_response = [{user: {id: user_5.id,
                                      user_name: user_5.user_name,
                                      created_at: user_5.created_at,
-                                     skills: user_5.skill_list.reverse,
+                                     skills: user_5.skill_list.sort,
                                      profile: api_v1_user_url(user_5)}
                              },
                              {user: {id: user_2.id,
                                      user_name: user_2.user_name,
                                      created_at: user_2.created_at,
-                                     skills: user_2.skill_list.reverse,
+                                     skills: user_2.skill_list.sort,
                                      profile: api_v1_user_url(user_2)}
                              }]
         expect(response_json['matches']).to eq JSON.parse(expected_response.to_json)
@@ -118,6 +108,7 @@ describe Api::V1::UsersController do
     end
 
     describe 'by location and skills' do
+
       before do
         user_1.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
         user_2.update(latitude: '57.708870', longitude: '11.97456') #Gothenburg, Sweden
@@ -125,21 +116,26 @@ describe Api::V1::UsersController do
         user_4.update(latitude: '53.551085', longitude: '9.993682') #Hamburg, Germany
         user_5.update(latitude: '53.551085', longitude: '9.993682') #Hamburg, Germany
       end
+
       it 'should return list of users' do
         get "/api/v1/unify/#{user_1.id}", params: {location: true}, headers: headers
 
         expected_response = [{user: {id: user_2.id,
                                      user_name: user_2.user_name,
                                      created_at: user_2.created_at,
-                                     skills: user_2.skill_list.reverse,
+                                     skills: user_2.skill_list.sort,
                                      profile: api_v1_user_url(user_2)}
                              }]
         expect(response_json['matches']).to eq JSON.parse(expected_response.to_json)
       end
 
+      it 'should not return a mentor when mentor requests to unify' do
+        user_2.update(mentor: true)
+        get "/api/v1/unify/#{user_1.id}", params: {location: true}, headers: headers
+        expect(response_json['matches']).to be_empty
+      end
+
     end
-
-
   end
 
   describe 'POST /api/v1/skills/:id' do

@@ -13,8 +13,7 @@ class Api::V1::UsersController < ApiController
 
   def unify
     @user = User.find(params[:id])
-    binding.pry
-    @unified_users = params[:location] == 'true' ? @user.unify(location: true) : @user.unify
+    @unified_users = @user.unify(location: unify_params[:location])
   end
 
   def skills
@@ -68,9 +67,8 @@ class Api::V1::UsersController < ApiController
   private
   def unify_params
     permitted = params.permit(:location)
-    if permitted
-      
-    end
+    permitted[:location] = permitted[:location] == "true" ? true : false
+    permitted
   end
 end
 
