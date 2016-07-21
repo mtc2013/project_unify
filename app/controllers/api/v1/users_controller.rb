@@ -13,7 +13,8 @@ class Api::V1::UsersController < ApiController
 
   def unify
     @user = User.find(params[:id])
-    @unified_users = @user.unify
+    binding.pry
+    @unified_users = @user.unify(location: params[:location])
   end
 
   def skills
