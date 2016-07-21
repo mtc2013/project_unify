@@ -6,6 +6,8 @@ class User < ApplicationRecord
 
   acts_as_taggable_on :skills
   acts_as_messageable
+  has_many :skills, foreign_key: :taggable_id
+  has_many :tags, through: :skills
 
   has_many :user_languages
   has_many :languages, through: :user_languages
@@ -29,29 +31,13 @@ class User < ApplicationRecord
   scope :mentors, -> { where(mentor: true) }
   scope :mentorees, -> { where(mentor: false) }
 
-
   def to_s
     user_name
   end
 
   def unify(rad = 20, location: false )
-    if location
-      #Gives me an ActiveRecord::Relation with all Objects within the specific area
-      #todo: refactor this into something better
-      nearbys = self.nearbys(rad)
-      skill = self.find_related_skills
-      intersection = []
-      skill.each do |usr|
-        if nearbys.include? usr
-          intersection.push usr
-        end
-      end
-      intersection
-      #User.from(User.arel_table.create_table_alias(total, :users))
-    else
-      #Gives me an ActiveRecord::Relation with all related skills
-      self.mentor ? self.find_related_skills.mentorees : self.find_related_skills
-    end
+    results = location == true ? self.nearbys(rad).joins(:tags).where(tags: {name: tags.pluck(:name)}).uniq : self.find_related_skills
+    self.mentor ? results.mentorees : results
   end
 
   def self.from_omniauth(auth)
