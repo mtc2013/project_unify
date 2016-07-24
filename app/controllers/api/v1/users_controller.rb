@@ -7,7 +7,7 @@ class Api::V1::UsersController < ApiController
   end
 
   def index_pending_friendships
-    @users = User.joins('INNER JOIN "friendships" on "friendships"."friend_id" = "users"."id"').where(friendable_id: params[:id])
+    @users = User.find(params[:id]).pending_invited_by
     render 'index'
   end
 
