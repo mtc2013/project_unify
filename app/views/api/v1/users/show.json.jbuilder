@@ -30,5 +30,6 @@ json.user do
     end
 
     json.blocked_by_current_user current_user.blocked? user
+
   end
 end
